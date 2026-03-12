@@ -1,0 +1,21 @@
+Package: gesoptools
+Title: GESOP Internal Tools
+Version: 0.0.0.9000
+Authors@R: 
+    person("Carlos", "Ochoa", , "cochoa@gesop.net", role = c("aut", "cre"))
+Description: Internal utilities for GESOP: Integra database access, data
+    export, survey data processing and visualization.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: 
+    DBI,
+    dplyr,
+    haven,
+    lubridate,
+    openxlsx,
+    RMariaDB,
+    stringr,
+    tibble
+Depends: R (>= 4.1.0)
