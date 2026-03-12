@@ -1,0 +1,90 @@
+# Cargar datos en Shiny
+
+## El contrato unificado
+
+[`load_integra_study()`](https://cochoa-gesop.github.io/gesoptools/es/reference/load_integra_study.md)
+devuelve siempre el mismo formato independientemente del estudio, lo que
+permite que el Shiny funcione con cualquier estudio sin cambiar codigo:
+
+| Tipo de variable       | Clase R     | Descripcion                      |
+|------------------------|-------------|----------------------------------|
+| Categorica             | `factor`    | levels = etiquetas de texto      |
+| Numerica               | `numeric`   | sin codebook                     |
+| Texto libre / multiple | `character` | multiples con “;” como separador |
+| REGISTRO               | `character` | identificador unico              |
+| FECHAFIN               | `Date`      | fecha de la entrevista           |
+| POND                   | `numeric`   | peso (1 si sin ponderar)         |
+| ESTUDI                 | `integer`   | id numerico del estudio          |
+| MES                    | `integer`   | mes de FECHAFIN                  |
+| DATA                   | `Date`      | max(FECHAFIN) por estudio        |
+
+## Uso basico
+
+``` r
+library(gesoptools)
+
+db_config <- db_config_from_env()
+
+resultado <- load_integra_study(
+  study_id  = "1824_POL_ARAGON",
+  db_config = db_config
+)
+
+datos    <- resultado$data
+variables <- resultado$metadata$variables  # tibble: nomvar, label
+codebook  <- resultado$metadata$codebook   # tibble: nomvar, value, label, label_short
+```
+
+## Uso en app.R de Shiny
+
+``` r
+# Al inicio de app.R, fuera del server
+library(gesoptools)
+
+db_config <- db_config_from_env()
+
+estudio <- load_integra_study(
+  study_id  = "1824_POL_ARAGON",
+  db_config = db_config
+)
+
+SURVEY   <- estudio$data
+CODEBOOK <- estudio$metadata$codebook
+```
+
+## Opciones avanzadas
+
+``` r
+# Solo estados validos determinados (por defecto c(1,5,6,9))
+resultado <- load_integra_study(
+  study_id     = "1824_POL_ARAGON",
+  db_config    = db_config,
+  valid_states = c(1, 5)
+)
+
+# Unificar NS/NC en el codebook
+resultado <- load_integra_study(
+  study_id     = "1824_POL_ARAGON",
+  db_config    = db_config,
+  ns_nc_recode = TRUE
+)
+
+# Sin limpieza de etiquetas
+resultado <- load_integra_study(
+  study_id           = "1824_POL_ARAGON",
+  db_config          = db_config,
+  clean_html         = FALSE,
+  clean_instructions = FALSE
+)
+```
+
+## Acceder al codebook
+
+``` r
+# Etiquetas de una variable concreta
+codebook |>
+  dplyr::filter(nomvar == "SEXE")
+
+# Todas las variables con su etiqueta
+resultado$metadata$variables
+```

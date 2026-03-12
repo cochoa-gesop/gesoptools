@@ -1,0 +1,57 @@
+url: https://cochoa-gesop.github.io/gesoptools/es
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+home:
+  title: "gesoptools — Herramientas internas GESOP"
+  description: >
+    Package R de uso interno en GESOP para la conexion a la base de datos
+    Integra, exportacion de datos de encuesta y procesamiento de ficheros SPSS.
+
+navbar:
+  title: "gesoptools"
+  left:
+    - text: "Inicio"
+      href: index.html
+    - text: "Funciones"
+      href: reference/index.html
+    - text: "Articulos"
+      menu:
+        - text: "Guia de inicio rapido"
+          href: articles/quickstart.html
+        - text: "Exportar a SPSS y Excel"
+          href: articles/export.html
+        - text: "Cargar datos en Shiny"
+          href: articles/shiny.html
+        - text: "Configurar credenciales"
+          href: articles/credentials.html
+  right:
+    - text: "CA"
+      href: "https://cochoa-gesop.github.io/gesoptools/ca"
+    - icon: fab fa-github
+      href: https://github.com/cochoa-gesop/gesoptools
+
+reference:
+  - title: "Conexion y configuracion"
+    desc: "Funciones para configurar y verificar la conexion a la BD Integra."
+    contents:
+      - db_config_from_env
+  - title: "Exportacion de datos"
+    desc: "Exportar un estudio a fichero SPSS (.sav) o Excel (.xlsx)."
+    contents:
+      - export_integra
+  - title: "Carga de datos"
+    desc: "Cargar datos de un estudio directamente en R con el contrato unificado."
+    contents:
+      - load_integra_study
+  - title: "Utilidades SPSS"
+    desc: "Aplicar un diccionario de variables revisado a un fichero SPSS existente."
+    contents:
+      - apply_variables_dict
+
+footer:
+  structure:
+    left: developed_by
+    right: built_with
