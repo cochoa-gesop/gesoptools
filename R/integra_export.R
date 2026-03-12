@@ -45,6 +45,7 @@ utils::globalVariables(c(
 #'
 #' @param renviron_path Ruta al fichero .Renviron. NULL = buscar automaticamente.
 #' @return Lista con host, port, user, password, dbname lista para pasar a export_integra()
+#' @export
 db_config_from_env <- function(renviron_path = NULL) {
 
   # Cargar .Renviron si se indica o si existe en ubicaciones est\u00E1ndar
@@ -113,6 +114,7 @@ db_config_from_env <- function(renviron_path = NULL) {
 #' @param overwrite            Si TRUE, sobreescribe ficheros existentes
 #'
 #' @return Lista invisible con rutas de los ficheros generados
+#' @export
 export_integra <- function(study_id,
                            db_config,
                            format               = NULL,
@@ -304,6 +306,7 @@ export_integra <- function(study_id,
 #'   $data     data frame con el contrato unificado
 #'   $metadata lista con $variables (nomvar, label) y
 #'             $codebook  (nomvar, value, label, label_short)
+#' @export
 load_integra_study <- function(study_id,
                                 db_config,
                                 valid_states       = c(1, 5, 6, 9),
@@ -1139,6 +1142,7 @@ SPSS_MAX_LABEL <- 120L
 #'                        (por defecto c(97, 98, 99))
 #'
 #' @return Ruta al fichero .sav generado (invisible)
+#' @export
 apply_variables_dict <- function(spss_path,
                                  variables_path,
                                  output_path     = NULL,
