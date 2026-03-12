@@ -2,7 +2,7 @@
 
 ## El contrato unificado
 
-[`load_integra_study()`](https://cochoa-gesop.github.io/gesoptools/es/reference/load_integra_study.md)
+[`load_integra_study()`](https://cochoa-gesop.github.io/gesoptools/reference/load_integra_study.md)
 devuelve siempre el mismo formato independientemente del estudio, lo que
 permite que el Shiny funcione con cualquier estudio sin cambiar codigo:
 

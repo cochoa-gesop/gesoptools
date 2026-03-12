@@ -2,7 +2,7 @@
 
 ## La funcion export_integra()
 
-[`export_integra()`](https://cochoa-gesop.github.io/gesoptools/es/reference/export_integra.md)
+[`export_integra()`](https://cochoa-gesop.github.io/gesoptools/reference/export_integra.md)
 conecta a la BD Integra, descarga los datos de un estudio y los exporta
 a SPSS o Excel con todas las etiquetas correctamente aplicadas.
 
@@ -14,7 +14,7 @@ Ademas del fichero de datos, siempre genera un fichero
 
 Este fichero puede editarse a mano y luego aplicarse de nuevo al SPSS
 con
-[`apply_variables_dict()`](https://cochoa-gesop.github.io/gesoptools/es/reference/apply_variables_dict.md).
+[`apply_variables_dict()`](https://cochoa-gesop.github.io/gesoptools/reference/apply_variables_dict.md).
 
 ## Exportacion basica
 

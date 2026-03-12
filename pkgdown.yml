@@ -6,7 +6,7 @@ articles:
   export: export.html
   quickstart: quickstart.html
   shiny: shiny.html
-last_built: 2026-03-12T14:48Z
+last_built: 2026-03-12T14:56Z
 urls:
-  reference: https://cochoa-gesop.github.io/gesoptools/es/reference
-  article: https://cochoa-gesop.github.io/gesoptools/es/articles
+  reference: https://cochoa-gesop.github.io/gesoptools/reference
+  article: https://cochoa-gesop.github.io/gesoptools/articles
