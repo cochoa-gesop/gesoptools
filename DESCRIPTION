@@ -19,3 +19,4 @@ Imports:
     stringr,
     tibble
 Depends: R (>= 4.1.0)
+URL: https://cochoa-gesop.github.io/gesoptools/
