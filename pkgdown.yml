@@ -1,0 +1,12 @@
+pandoc: 3.6.3
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  credentials: credentials.html
+  export: export.html
+  quickstart: quickstart.html
+  shiny: shiny.html
+last_built: 2026-03-12T14:48Z
+urls:
+  reference: https://cochoa-gesop.github.io/gesoptools/es/reference
+  article: https://cochoa-gesop.github.io/gesoptools/es/articles

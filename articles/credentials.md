@@ -1,0 +1,84 @@
+# Configurar credenciales
+
+## Variables de entorno necesarias
+
+`gesoptools` nunca almacena credenciales en el codigo. La conexion a
+Integra se configura mediante variables de entorno:
+
+| Variable           | Descripcion               | Ejemplo         |
+|--------------------|---------------------------|-----------------|
+| `INTEGRA_HOST`     | Servidor de la BD         | `192.168.1.100` |
+| `INTEGRA_PORT`     | Puerto (por defecto 3306) | `3306`          |
+| `INTEGRA_DBNAME`   | Nombre de la BD           | `integra4`      |
+| `INTEGRA_USER`     | Usuario                   | `gesop_user`    |
+| `INTEGRA_PASSWORD` | Contrasena                | `********`      |
+
+## Opcion 1: fichero .Renviron (recomendado)
+
+El fichero `.Renviron` se carga automaticamente al iniciar R y nunca
+debe subirse a Git.
+
+Para editarlo:
+
+``` r
+usethis::edit_r_environ()
+```
+
+Anade estas lineas y guarda:
+
+    INTEGRA_HOST=tu-servidor
+    INTEGRA_PORT=3306
+    INTEGRA_DBNAME=integra4
+    INTEGRA_USER=tu-usuario
+    INTEGRA_PASSWORD=tu-contrasena
+
+Reinicia R para que surtan efecto.
+
+## Opcion 2: .Renviron en el proyecto
+
+Si trabajas en varios proyectos con distintas credenciales, puedes tener
+un `.Renviron` especifico por proyecto:
+
+``` r
+usethis::edit_r_environ(scope = "project")
+```
+
+Este fichero debe estar en `.gitignore`:
+
+``` r
+usethis::use_git_ignore(".Renviron")
+```
+
+## Opcion 3: variables del sistema
+
+En servidores de produccion (shinyapps.io, servidor propio) se
+configuran directamente como variables de entorno del sistema o del
+servicio, sin necesidad de `.Renviron`.
+
+## Verificar la configuracion
+
+``` r
+library(gesoptools)
+db_config <- db_config_from_env()
+```
+
+Si alguna variable falta, la funcion lanza un error indicando
+exactamente cual. Si todas estan presentes, devuelve la lista lista para
+usar:
+
+``` r
+str(db_config)
+# List of 5
+#  $ host    : chr "..."
+#  $ port    : int 3306
+#  $ dbname  : chr "integra4"
+#  $ user    : chr "..."
+#  $ password: chr "..."
+```
+
+## Seguridad
+
+- Nunca incluyas credenciales en el codigo fuente
+- Nunca subas `.Renviron` a Git (asegurate de que esta en `.gitignore`)
+- En shinyapps.io, usa las variables de entorno del panel de control
+  (Application \> Environment Variables)

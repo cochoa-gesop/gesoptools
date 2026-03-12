@@ -1,0 +1,78 @@
+# Guia de inicio rapido
+
+## Instalacion
+
+``` r
+remotes::install_github("cochoa-gesop/gesoptools")
+library(gesoptools)
+```
+
+## Configurar las credenciales
+
+Las credenciales de la BD Integra nunca se escriben en el codigo. Se
+guardan en un fichero `.Renviron` local a cada maquina:
+
+    INTEGRA_HOST=tu-servidor
+    INTEGRA_PORT=3306
+    INTEGRA_DBNAME=integra4
+    INTEGRA_USER=tu-usuario
+    INTEGRA_PASSWORD=tu-contrasena
+
+Puedes editar este fichero con:
+
+``` r
+usethis::edit_r_environ()
+```
+
+Despues de guardarlo, reinicia R para que los cambios surtan efecto.
+
+Para verificar que las credenciales estan bien configuradas:
+
+``` r
+db_config <- db_config_from_env()
+```
+
+Si algo falta, la funcion te indicara exactamente que variable de
+entorno falta definir.
+
+## Exportar un estudio a SPSS
+
+``` r
+library(gesoptools)
+
+db_config <- db_config_from_env()
+
+export_integra(
+  study_id  = "1824_POL_ARAGON",
+  db_config = db_config,
+  format    = "spss"
+)
+```
+
+Esto genera dos ficheros en el directorio de trabajo: -
+`1824_POL_ARAGON.sav` — datos con etiquetas -
+`variables_1824_POL_ARAGON.xlsx` — diccionario de variables
+
+## Exportar a Excel
+
+``` r
+export_integra(
+  study_id  = "1824_POL_ARAGON",
+  db_config = db_config,
+  format    = "excel"
+)
+```
+
+## Cargar datos en R
+
+Para usar los datos directamente en R (por ejemplo en un Shiny):
+
+``` r
+resultado <- load_integra_study(
+  study_id  = "1824_POL_ARAGON",
+  db_config = db_config
+)
+
+datos    <- resultado$data      # data frame listo para usar
+codebook <- resultado$metadata  # variables y codebook
+```
