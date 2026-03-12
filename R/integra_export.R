@@ -432,15 +432,18 @@ load_integra_study <- function(study_id,
 
   df <- raw_data |>
     tibble::as_tibble() |>
-    dplyr::select(dplyr::all_of(keep)) |>
+    dplyr::select(dplyr::all_of(keep))
+
+  cols_numeric <- intersect(numeric_vars, names(df))
+  cols_text    <- intersect(text_vars,    names(df))
+  cols_factor  <- intersect(factor_vars,  names(df))
+
+  df <- df |>
     # Tipos base
     dplyr::mutate(
-      dplyr::across(dplyr::all_of(intersect(numeric_vars, names(.))),
-                    ~ suppressWarnings(as.numeric(.))),
-      dplyr::across(dplyr::all_of(intersect(text_vars, names(.))),
-                    as.character),
-      dplyr::across(dplyr::all_of(intersect(factor_vars, names(.))),
-                    ~ suppressWarnings(as.numeric(.)))
+      dplyr::across(dplyr::all_of(cols_numeric), ~ suppressWarnings(as.numeric(.))),
+      dplyr::across(dplyr::all_of(cols_text),    as.character),
+      dplyr::across(dplyr::all_of(cols_factor),  ~ suppressWarnings(as.numeric(.)))
     ) |>
     # Limpiar "-" como NA en columnas character
     dplyr::mutate(dplyr::across(dplyr::where(is.character),
@@ -461,10 +464,11 @@ load_integra_study <- function(study_id,
   }
 
   # -- Columnas derivadas: REGISTRO, POND, ESTUDI, MES, DATA -------------------
+  has_pond <- "POND" %in% names(df)
   df <- df |>
     dplyr::mutate(
       REGISTRO = as.character(REGISTRO),
-      POND     = if ("POND" %in% names(.)) as.numeric(POND) else 1,
+      POND     = if (has_pond) as.numeric(POND) else 1,
       ESTUDI   = as.integer(substr(study_id, 1, 4)),
       MES      = as.integer(lubridate::month(FECHAFIN))
     ) |>
@@ -890,12 +894,15 @@ ADMIN_COLS <- c("REGISTRO", "FECHAFIN", "POND", "POND_1", "ESTUDI",
   keep <- intersect(keep, names(raw$data))
 
   df <- raw$data |>
-    dplyr::select(dplyr::all_of(keep)) |>
+    dplyr::select(dplyr::all_of(keep))
+
+  cols_numeric <- intersect(numeric_vars, names(df))
+  cols_char    <- intersect(c(open_vars, char_multi, char_text), names(df))
+
+  df <- df |>
     dplyr::mutate(
-      dplyr::across(dplyr::all_of(intersect(numeric_vars, names(.))),
-                    ~ suppressWarnings(as.numeric(.))),
-      dplyr::across(dplyr::all_of(intersect(c(open_vars, char_multi, char_text), names(.))),
-                    as.character)
+      dplyr::across(dplyr::all_of(cols_numeric), ~ suppressWarnings(as.numeric(.))),
+      dplyr::across(dplyr::all_of(cols_char),    as.character)
       # date_vars se dejan sin tocar: mantienen su clase Date/POSIXct
     )
   df
