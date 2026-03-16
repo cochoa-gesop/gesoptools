@@ -143,10 +143,10 @@ export_integra <- function(study_id,
 
   # -- 2. Limpieza de etiquetas -----------------------------------------------
   raw$variables <- .clean_labels(raw$variables, clean_html, strip_parens,
-                                  clean_instructions, clean_specific_texts)
+                                 clean_instructions, clean_specific_texts)
   raw$codebook  <- .clean_labels(raw$codebook,  clean_html, strip_parens,
-                                  clean_instructions, clean_specific_texts,
-                                  cols = "label")
+                                 clean_instructions, clean_specific_texts,
+                                 cols = "label")
 
   # -- 3. Filtro de variables -------------------------------------------------
   if (!is.null(var_filter)) {
@@ -170,7 +170,7 @@ export_integra <- function(study_id,
   }
 
   df_codes  <- .build_coded_df(raw, include_admin,
-                                multi_vars = multi_vars_detected)
+                               multi_vars = multi_vars_detected)
 
   # -- 4b. Expandir variables de respuesta m\u00FAltiple -------------------------
   # (se hace antes de encode para que expand lea los c\u00F3digos num\u00E9ricos originales)
@@ -308,12 +308,12 @@ export_integra <- function(study_id,
 #'             $codebook  (nomvar, value, label, label_short)
 #' @export
 load_integra_study <- function(study_id,
-                                db_config,
-                                valid_states       = c(1, 5, 6, 9),
-                                idioma             = 1L,
-                                clean_html         = TRUE,
-                                clean_instructions = TRUE,
-                                ns_nc_recode       = TRUE) {
+                               db_config,
+                               valid_states       = c(1, 5, 6, 9),
+                               idioma             = 1L,
+                               clean_html         = TRUE,
+                               clean_instructions = TRUE,
+                               ns_nc_recode       = TRUE) {
 
   # -- 1. Obtener datos brutos y codebook desde la BD ---------------------------
   message("[load_integra_study] Conectando a BD para estudio: ", study_id)
@@ -323,12 +323,12 @@ load_integra_study <- function(study_id,
 
   # -- 2. Limpiar etiquetas -----------------------------------------------------
   raw$variables <- .clean_labels(raw$variables, clean_html,
-                                  strip_parens       = FALSE,
-                                  clean_instructions = clean_instructions)
+                                 strip_parens       = FALSE,
+                                 clean_instructions = clean_instructions)
   raw$codebook  <- .clean_labels(raw$codebook,  clean_html,
-                                  strip_parens       = FALSE,
-                                  clean_instructions = clean_instructions,
-                                  cols               = "label")
+                                 strip_parens       = FALSE,
+                                 clean_instructions = clean_instructions,
+                                 cols               = "label")
 
   # -- 3. Unificar NS/NC --------------------------------------------------------
   if (ns_nc_recode) {
@@ -544,9 +544,9 @@ load_integra_study <- function(study_id,
 # -----------------------------------------------------------------------------
 
 .clean_labels <- function(df, clean_html, strip_parens,
-                           clean_instructions   = FALSE,
-                           clean_specific_texts = NULL,
-                           cols = "label") {
+                          clean_instructions   = FALSE,
+                          clean_specific_texts = NULL,
+                          cols = "label") {
 
   # Textos de instrucci\u00F3n internos -- ampliar aqu\u00ED en el futuro
   INSTRUCTION_TEXTS <- c(
@@ -708,8 +708,8 @@ load_integra_study <- function(study_id,
     # Si no hay niveles en el codebook, no se puede expandir -> saltar
     if (length(cb_codes) == 0) {
       warning(paste0("[integra_export] Variable '", v,
-               "' detectada como m\u00FAltiple pero sin niveles en el codebook -- se mantiene como est\u00E1."),
-               call. = FALSE)
+                     "' detectada como m\u00FAltiple pero sin niveles en el codebook -- se mantiene como est\u00E1."),
+              call. = FALSE)
       next
     }
 
@@ -754,8 +754,8 @@ load_integra_study <- function(study_id,
       # Insertar columnas derivadas junto a la original
       if (length(new_cols) == 0) {
         warning(paste0("[integra_export] Variable '", v,
-               "' no gener\u00F3 columnas derivadas (codebook sin c\u00F3digos v\u00E1lidos) -- se mantiene como est\u00E1."),
-               call. = FALSE)
+                       "' no gener\u00F3 columnas derivadas (codebook sin c\u00F3digos v\u00E1lidos) -- se mantiene como est\u00E1."),
+                call. = FALSE)
         next
       }
       derived_df <- tibble::as_tibble(new_cols)
@@ -856,7 +856,7 @@ ADMIN_COLS <- c("REGISTRO", "FECHAFIN", "POND", "POND_1", "ESTUDI",
 
   # Variables fecha/datetime: preservar clase Date/POSIXct (vienen de BD)
   all_keep_preview <- c(coded_vars, multi_vars, open_vars,
-    if (include_admin) intersect(ADMIN_COLS, names(raw$data)) else character(0))
+                        if (include_admin) intersect(ADMIN_COLS, names(raw$data)) else character(0))
   all_keep_preview <- intersect(all_keep_preview, names(raw$data))
   date_vars <- all_keep_preview[sapply(all_keep_preview, function(v)
     inherits(raw$data[[v]], c("Date", "POSIXct", "POSIXt")))]
@@ -869,14 +869,14 @@ ADMIN_COLS <- c("REGISTRO", "FECHAFIN", "POND", "POND_1", "ESTUDI",
   # (ej. B2_2_ENTITAT1: respuesta abierta no marcada con _O en Integra)
   vars_sin_codebook <- numeric_vars[
     !numeric_vars %in% raw$codebook$nomvar &
-    numeric_vars %in% names(raw$data) &
-    sapply(numeric_vars, function(v) {
-      if (!v %in% names(raw$data)) return(FALSE)
-      vals <- raw$data[[v]][!is.na(raw$data[[v]])]
-      if (length(vals) == 0) return(FALSE)
-      pct_num <- mean(!is.na(suppressWarnings(as.numeric(as.character(vals)))))
-      pct_num < 0.5  # menos del 50% convertible a n\u00FAmero -> es texto
-    })
+      numeric_vars %in% names(raw$data) &
+      sapply(numeric_vars, function(v) {
+        if (!v %in% names(raw$data)) return(FALSE)
+        vals <- raw$data[[v]][!is.na(raw$data[[v]])]
+        if (length(vals) == 0) return(FALSE)
+        pct_num <- mean(!is.na(suppressWarnings(as.numeric(as.character(vals)))))
+        pct_num < 0.5  # menos del 50% convertible a n\u00FAmero -> es texto
+      })
   ]
   if (length(vars_sin_codebook) > 0)
     message("[integra_export] Variables de texto libre sin _O detectadas (",
@@ -934,13 +934,23 @@ SPSS_MAX_LABEL <- 120L
   truncated_vars <- character(0)
   for (v in names(df)) {
     col <- df[[v]]
-    if (!is.factor(col)) next
-    lvls <- levels(col)
-    long <- nchar(lvls) > SPSS_MAX_LABEL
-    if (any(long)) {
-      levels(col)[long] <- substr(lvls[long], 1L, SPSS_MAX_LABEL)
-      df[[v]] <- col
-      truncated_vars <- c(truncated_vars, v)
+    if (is.factor(col)) {
+      lvls <- levels(col)
+      long <- nchar(lvls) > SPSS_MAX_LABEL
+      if (any(long)) {
+        levels(col)[long] <- substr(lvls[long], 1L, SPSS_MAX_LABEL)
+        df[[v]] <- col
+        truncated_vars <- c(truncated_vars, v)
+      }
+    } else if (haven::is.labelled(col)) {
+      lbls <- haven::val_labels(col)
+      long <- nchar(names(lbls)) > SPSS_MAX_LABEL
+      if (any(long)) {
+        names(lbls)[long] <- substr(names(lbls)[long], 1L, SPSS_MAX_LABEL)
+        haven::val_labels(col) <- lbls
+        df[[v]] <- col
+        truncated_vars <- c(truncated_vars, v)
+      }
     }
   }
   if (length(truncated_vars) > 0) {
@@ -980,7 +990,9 @@ SPSS_MAX_LABEL <- 120L
       if (is.factor(col)) n_factor <- n_factor + 1
 
     } else if (nrow(cb) > 0) {
-      # Variable num\u00E9rica con codebook: convertir a factor con etiquetas
+      # Variable num\u00E9rica con codebook: convertir a haven_labelled para que SPSS
+      # conserve los c\u00F3digos originales de la BD (en lugar de posiciones 1..n
+      # que genera factor()).
       codes  <- suppressWarnings(as.numeric(trimws(as.character(cb$value))))
       labels <- as.character(cb$label)
       valid  <- !is.na(codes)
@@ -989,8 +1001,9 @@ SPSS_MAX_LABEL <- 120L
         codes   <- codes[valid]
         labels  <- labels[valid]
         raw_num <- suppressWarnings(as.numeric(col))
-        col     <- factor(raw_num, levels = codes, labels = labels)
-        if (!is.null(var_label)) attr(col, "label") <- var_label
+        val_labels <- stats::setNames(codes, labels)
+        col <- haven::labelled(raw_num, labels = val_labels,
+                               label = var_label)
         df_out[[v]] <- col
         n_factor <- n_factor + 1
       }
@@ -1002,7 +1015,7 @@ SPSS_MAX_LABEL <- 120L
     }
   }
 
-  message(context, "Variables convertidas a factor: ", n_factor,
+  message(context, "Variables con value labels (haven_labelled): ", n_factor,
           " de ", ncol(df_out), " totales")
 
   .truncate_factor_labels(tibble::as_tibble(df_out), context = context)
@@ -1042,7 +1055,7 @@ SPSS_MAX_LABEL <- 120L
                       headerStyle = .header_style())
   openxlsx::addStyle(wb, "Codigos",
                      style  = openxlsx::createStyle(textDecoration = "italic",
-                                                     fontColour = "#666666"),
+                                                    fontColour = "#666666"),
                      rows   = 1,
                      cols   = seq_along(names(df_codes)),
                      gridExpand = TRUE)
@@ -1231,7 +1244,7 @@ apply_variables_dict <- function(spss_path,
     # 4a. Etiqueta de variable
     lbl <- preguntas$etiqueta[preguntas$variable == v]
     var_label <- if (length(lbl) == 1 && !is.na(lbl) && nzchar(trimws(lbl)))
-                   trimws(lbl) else NULL
+      trimws(lbl) else NULL
 
     # 4b. Niveles del Excel
     cb <- niveles[niveles$variable == v, ]
@@ -1327,7 +1340,7 @@ apply_variables_dict <- function(spss_path,
       } else if (tipo_real == "TEXTO" && tipo_nuevo == "N\u00DAMERO") {
         vals_noNA <- col[!is.na(col) & nzchar(col)]
         pct_num   <- if (length(vals_noNA) > 0)
-                       mean(!is.na(suppressWarnings(as.numeric(vals_noNA)))) else 0
+          mean(!is.na(suppressWarnings(as.numeric(vals_noNA)))) else 0
         if (pct_num >= 1.0) {
           col <- suppressWarnings(as.numeric(col))
           converted <- TRUE
