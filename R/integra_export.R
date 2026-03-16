@@ -797,8 +797,8 @@ load_integra_study <- function(study_id,
           suppressWarnings(as.numeric(x[k]))
         })
 
-        col_fct <- factor(raw_k, levels = cb_codes, labels = cb_labels)
-        attr(col_fct, "label") <- col_label
+        val_labels_k <- stats::setNames(cb_codes, cb_labels)
+        col_fct <- haven::labelled(raw_k, labels = val_labels_k, label = col_label)
 
         new_cols[[new_name]] <- col_fct
         new_var_rows[[k]]    <- tibble::tibble(nomvar = new_name, label = col_label)
@@ -982,30 +982,30 @@ SPSS_MAX_LABEL <- 120L
 
     col <- df_out[[v]]
 
-    # Si la columna ya es factor, character o fecha: solo aplicar var_label
-    if (is.factor(col) || is.character(col) ||
-        inherits(col, c("Date", "POSIXct", "POSIXt"))) {
+    # Si la columna es fecha o character: solo aplicar var_label
+    if (is.character(col) || inherits(col, c("Date", "POSIXct", "POSIXt"))) {
       if (!is.null(var_label)) attr(col, "label") <- var_label
       df_out[[v]] <- col
-      if (is.factor(col)) n_factor <- n_factor + 1
 
     } else if (nrow(cb) > 0) {
-      # Variable num\u00E9rica con codebook: convertir a haven_labelled para que SPSS
-      # conserve los c\u00F3digos originales de la BD (en lugar de posiciones 1..n
-      # que genera factor()).
+      # Variable con codebook (ya sea numeric o factor pre-existente):
+      # convertir a haven_labelled para que SPSS conserve los c\u00F3digos originales
+      # de la BD (factor() usa posiciones 1..n como c\u00F3digos, lo cual es incorrecto).
       codes  <- suppressWarnings(as.numeric(trimws(as.character(cb$value))))
       labels <- as.character(cb$label)
       valid  <- !is.na(codes)
 
       if (any(valid)) {
-        codes   <- codes[valid]
-        labels  <- labels[valid]
-        raw_num <- suppressWarnings(as.numeric(col))
+        codes      <- codes[valid]
+        labels     <- labels[valid]
+        raw_num    <- suppressWarnings(as.numeric(col))
         val_labels <- stats::setNames(codes, labels)
-        col <- haven::labelled(raw_num, labels = val_labels,
-                               label = var_label)
+        col <- haven::labelled(raw_num, labels = val_labels, label = var_label)
         df_out[[v]] <- col
         n_factor <- n_factor + 1
+      } else {
+        if (!is.null(var_label)) attr(col, "label") <- var_label
+        df_out[[v]] <- col
       }
 
     } else {
@@ -1015,7 +1015,7 @@ SPSS_MAX_LABEL <- 120L
     }
   }
 
-  message(context, "Variables con value labels (haven_labelled): ", n_factor,
+  message(context, "Variables con value labels: ", n_factor,
           " de ", ncol(df_out), " totales")
 
   .truncate_factor_labels(tibble::as_tibble(df_out), context = context)
