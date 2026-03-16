@@ -1,19 +1,19 @@
 # =============================================================================
 # integra_export.R
-# Exportaci\u00F3n de datos desde la BD Integra
+# Exportación de datos desde la BD Integra
 #
-# Funci\u00F3n principal:
+# Función principal:
 #   export_integra(study_id, db_config, format, ...)
 #
 # Formatos soportados:
 #   "spss"  -> fichero .sav perfectamente etiquetado
-#   "excel" -> fichero .xlsx con pesta\u00F1a de c\u00F3digos y pesta\u00F1a de etiquetas
+#   "excel" -> fichero .xlsx con pestaña de códigos y pestaña de etiquetas
 #
-# Siempre genera adem\u00E1s un fichero "variables_<study_id>.xlsx" con:
-#   - Pesta\u00F1a "preguntas": nomvar + etiqueta de la pregunta
-#   - Pesta\u00F1a "niveles":   nomvar + c\u00F3digo + etiqueta del nivel
+# Siempre genera además un fichero "variables_<study_id>.xlsx" con:
+#   - Pestaña "preguntas": nomvar + etiqueta de la pregunta
+#   - Pestaña "niveles":   nomvar + código + etiqueta del nivel
 #
-# Uso m\u00EDnimo:
+# Uso mínimo:
 #   source("integra_export.R")
 #   export_integra("1824_POL_ARAGON", db_config, format = "spss")
 #   export_integra("1824_POL_ARAGON", db_config, format = "excel")
@@ -48,7 +48,7 @@ utils::globalVariables(c(
 #' @export
 db_config_from_env <- function(renviron_path = NULL) {
 
-  # Cargar .Renviron si se indica o si existe en ubicaciones est\u00E1ndar
+  # Cargar .Renviron si se indica o si existe en ubicaciones estándar
   if (!is.null(renviron_path)) {
     if (!file.exists(renviron_path))
       stop("Fichero .Renviron no encontrado: ", renviron_path)
@@ -76,14 +76,14 @@ db_config_from_env <- function(renviron_path = NULL) {
   )
   if (length(missing) > 0)
     stop("Variables de entorno no definidas: ", paste(missing, collapse = ", "),
-         "\nDef\u00EDnelas en tu fichero .Renviron o en el entorno del sistema.")
+         "\nDefínelas en tu fichero .Renviron o en el entorno del sistema.")
 
   list(host = host, port = port, user = user, password = password, dbname = dbname)
 }
 
 
 # -----------------------------------------------------------------------------
-# Funci\u00F3n principal
+# Función principal
 # -----------------------------------------------------------------------------
 
 #' Exporta datos de un estudio Integra a SPSS o Excel
@@ -135,7 +135,7 @@ export_integra <- function(study_id,
   multi_response <- match.arg(multi_response)
   if (!is.null(format)) dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
-  # -- 1. Conexi\u00F3n y carga bruta ----------------------------------------------
+  # -- 1. Conexión y carga bruta ----------------------------------------------
   message("[integra_export] Conectando a BD para estudio: ", study_id)
   raw <- .integra_fetch(study_id, db_config, valid_states, idioma)
   message("[integra_export] ", nrow(raw$data), " registros, ",
@@ -156,12 +156,12 @@ export_integra <- function(study_id,
 
   # -- 4. Construir data frames de salida -------------------------------------
 
-  # Detectar variables m\u00FAltiples en raw$data (antes de any as.numeric)
-  # Una variable es m\u00FAltiple si alg\u00FAn valor contiene ";" en los datos originales
+  # Detectar variables múltiples en raw$data (antes de any as.numeric)
+  # Una variable es múltiple si algún valor contiene ";" en los datos originales
   study_coded <- setdiff(raw$variables$nomvar,
                          raw$variables$nomvar[stringr::str_ends(raw$variables$nomvar, "_O")])
   # Detectar siempre, independientemente del modo -- necesario para tratar
-  # las m\u00FAltiples como texto (etiquetas separadas por ';') incluso en 'keep'
+  # las múltiples como texto (etiquetas separadas por ';') incluso en 'keep'
   multi_vars_detected <- character(0)
   for (.v in intersect(study_coded, names(raw$data))) {
     vals <- as.character(raw$data[[.v]])
@@ -172,8 +172,8 @@ export_integra <- function(study_id,
   df_codes  <- .build_coded_df(raw, include_admin,
                                multi_vars = multi_vars_detected)
 
-  # -- 4b. Expandir variables de respuesta m\u00FAltiple -------------------------
-  # (se hace antes de encode para que expand lea los c\u00F3digos num\u00E9ricos originales)
+  # -- 4b. Expandir variables de respuesta múltiple -------------------------
+  # (se hace antes de encode para que expand lea los códigos numéricos originales)
   if (multi_response != 'keep') {
     expanded <- .expand_multi_response(df_codes, raw$variables, raw$codebook,
                                        mode = multi_response,
@@ -183,7 +183,7 @@ export_integra <- function(study_id,
     raw$codebook   <- expanded$codebook
   }
 
-  # -- 4c. Codificar variables m\u00FAltiples originales como texto ---------------
+  # -- 4c. Codificar variables múltiples originales como texto ---------------
   # En 'keep': es el resultado final.
   # En 'dummy'/'split': convierte la variable original conservada (si drop_original=FALSE).
   # Las derivadas (factores) NO se tocan.
@@ -222,7 +222,7 @@ export_integra <- function(study_id,
   # -- 6. Exportar diccionario de variables -----------------------------------
   # Construir variables_dict directamente desde names(df_codes) para garantizar
   # que el Excel refleja exactamente las columnas que van al SPSS (mismo orden,
-  # mismas variables, incluyendo derivadas de m\u00FAltiples y admin).
+  # mismas variables, incluyendo derivadas de múltiples y admin).
   variables_dict <- tibble::tibble(
     nomvar   = names(df_codes),
     label    = sapply(names(df_codes), function(v) {
@@ -231,12 +231,12 @@ export_integra <- function(study_id,
     }, USE.NAMES = FALSE),
     tipo     = sapply(names(df_codes), function(v) {
       col <- df_codes[[v]]
-      # Tipo por l\u00F3gica de negocio: la clase en df_codes no refleja el tipo
-      # final del SPSS (la conversi\u00F3n a factor ocurre despu\u00E9s en .export_spss)
+      # Tipo por lógica de negocio: la clase en df_codes no refleja el tipo
+      # final del SPSS (la conversión a factor ocurre después en .export_spss)
       if (inherits(col, c("Date", "POSIXct", "POSIXt"))) {
         "FECHA"
       } else if (v %in% multi_vars_detected) {
-        "M\u00DALTIPLE"
+        "MÚLTIPLE"
       } else if (is.factor(col)) {
         "SIMPLE"
       } else if (is.character(col)) {
@@ -244,12 +244,12 @@ export_integra <- function(study_id,
       } else if (v %in% raw$codebook$nomvar) {
         "SIMPLE"
       } else {
-        "N\u00DAMERO"
+        "NÚMERO"
       }
     }, USE.NAMES = FALSE)
   )
 
-  # Verificaci\u00F3n: n\u00FAmero de variables en SPSS vs diccionario
+  # Verificación: número de variables en SPSS vs diccionario
   message("[integra_export] Columnas SPSS: ", ncol(df_codes),
           " | Variables en diccionario: ", nrow(variables_dict))
 
@@ -263,8 +263,8 @@ export_integra <- function(study_id,
 
   # -- 7. Construir objetos de retorno -----------------------------------------
   # $data: data frame con el mismo contenido que el SPSS (df_codes con labels)
-  # $variables: equivalente a la pesta\u00F1a "preguntas" del Excel
-  # $niveles: equivalente a la pesta\u00F1a "niveles" del Excel
+  # $variables: equivalente a la pestaña "preguntas" del Excel
+  # $niveles: equivalente a la pestaña "niveles" del Excel
   out_files$data <- .build_spss_df(df_codes, raw$variables, raw$codebook)
 
   out_files$variables <- variables_dict |>
@@ -280,7 +280,7 @@ export_integra <- function(study_id,
 
 
 # =============================================================================
-# Funci\u00F3n de carga para el Shiny (contrato unificado)
+# Función de carga para el Shiny (contrato unificado)
 # =============================================================================
 
 #' Carga un estudio de Integra y devuelve el data frame unificado listo para
@@ -339,12 +339,12 @@ load_integra_study <- function(study_id,
   df <- .build_unified_df(raw$data, raw$variables, raw$codebook, study_id)
 
   # -- 5. Construir codebook con label_short para el Shiny ----------------------
-  # label_short = versi\u00F3n corta para ejes de gr\u00E1ficos; en Integra coincide con label.
+  # label_short = versión corta para ejes de gráficos; en Integra coincide con label.
   codebook_shiny <- raw$codebook |>
     dplyr::mutate(label_short = label)
 
-  # A\u00F1adir entradas de MES (derivada, no viene de la BD)
-  month_labels <- c("Gener","Febrer","Mar\u00E7","Abril","Maig","Juny",
+  # Añadir entradas de MES (derivada, no viene de la BD)
+  month_labels <- c("Gener","Febrer","Març","Abril","Maig","Juny",
                     "Juliol","Agost","Setembre","Octubre","Novembre","Desembre")
   codebook_shiny <- dplyr::bind_rows(
     codebook_shiny,
@@ -391,8 +391,8 @@ load_integra_study <- function(study_id,
   study_vars <- variables$nomvar
 
   # -- Detectar tipos de cada variable -----------------------------------------
-  # Texto: variables _O expl\u00EDcitas + cualquier variable sin codebook cuyos
-  # valores no sean mayoritariamente num\u00E9ricos (misma l\u00F3gica que .build_coded_df)
+  # Texto: variables _O explícitas + cualquier variable sin codebook cuyos
+  # valores no sean mayoritariamente numéricos (misma lógica que .build_coded_df)
   open_vars <- study_vars[stringr::str_ends(study_vars, "_O")]
 
   vars_with_codebook <- unique(codebook$nomvar)
@@ -409,15 +409,15 @@ load_integra_study <- function(study_id,
 
   text_vars <- union(open_vars, extra_text_vars)
 
-  # M\u00FAltiples: tienen ";" en los valores
+  # Múltiples: tienen ";" en los valores
   coded_vars <- setdiff(study_vars, text_vars)
   multi_vars <- coded_vars[sapply(coded_vars, function(v) {
     if (!v %in% names(raw_data)) return(FALSE)
     any(grepl(";", as.character(raw_data[[v]]), fixed = TRUE), na.rm = TRUE)
   })]
-  text_vars <- union(text_vars, multi_vars)  # m\u00FAltiples -> character
+  text_vars <- union(text_vars, multi_vars)  # múltiples -> character
 
-  # Resto: num\u00E9ricas con codebook -> factor; sin codebook -> numeric
+  # Resto: numéricas con codebook -> factor; sin codebook -> numeric
   factor_vars  <- setdiff(coded_vars, multi_vars)
   numeric_vars <- setdiff(factor_vars, vars_with_codebook)
   factor_vars  <- intersect(factor_vars, vars_with_codebook)
@@ -485,7 +485,7 @@ load_integra_study <- function(study_id,
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# Conexi\u00F3n y lectura
+# Conexión y lectura
 # -----------------------------------------------------------------------------
 
 .integra_fetch <- function(study_id, db_config, valid_states, idioma) {
@@ -524,14 +524,14 @@ load_integra_study <- function(study_id,
     dplyr::rename(label = txtext) |>
     dplyr::mutate(label = stringr::str_squish(label))
 
-  # Codebook (una fila por c\u00F3digo por variable)
-  # nomcod = etiqueta del nivel, defcod = c\u00F3digo num\u00E9rico
+  # Codebook (una fila por código por variable)
+  # nomcod = etiqueta del nivel, defcod = código numérico
   codebook <- variable_codes |>
     dplyr::distinct(nomvar, nomcod, defcod) |>
     dplyr::filter(nzchar(trimws(nomcod)), nzchar(trimws(defcod))) |>
     dplyr::mutate(
       label = stringr::str_squish(as.character(nomcod)),
-      value = trimws(as.character(defcod))   # c\u00F3digo num\u00E9rico como string limpio
+      value = trimws(as.character(defcod))   # código numérico como string limpio
     ) |>
     dplyr::select(nomvar, value, label)
 
@@ -548,7 +548,7 @@ load_integra_study <- function(study_id,
                           clean_specific_texts = NULL,
                           cols = "label") {
 
-  # Textos de instrucci\u00F3n internos -- ampliar aqu\u00ED en el futuro
+  # Textos de instrucción internos -- ampliar aquí en el futuro
   INSTRUCTION_TEXTS <- c(
     "(no leer)",
     "(anotar)",
@@ -598,7 +598,7 @@ load_integra_study <- function(study_id,
 # Construir data frames de salida
 # -----------------------------------------------------------------------------
 
-# Helper: insertar columnas derivadas en la posici\u00F3n correcta dentro de un df
+# Helper: insertar columnas derivadas en la posición correcta dentro de un df
 .insert_cols <- function(df, after_var, derived_df, keep_original = TRUE) {
   orig_pos <- which(names(df) == after_var)
   col_names <- names(df)
@@ -611,7 +611,7 @@ load_integra_study <- function(study_id,
     right <- if (orig_pos < length(col_names)) col_names[(orig_pos + 1):length(col_names)] else character(0)
   }
 
-  # Si derived_df est\u00E1 vac\u00EDo, simplemente eliminar/mantener la original sin a\u00F1adir nada
+  # Si derived_df está vacío, simplemente eliminar/mantener la original sin añadir nada
   if (ncol(derived_df) == 0) {
     keep_cols <- if (keep_original) col_names else c(left, right)
     return(df[, keep_cols, drop = FALSE])
@@ -626,7 +626,7 @@ load_integra_study <- function(study_id,
 
 
 .encode_multi_as_text <- function(df, multi_vars, variables, codebook) {
-  # Para cada variable m\u00FAltiple, reemplaza los c\u00F3digos num\u00E9ricos separados por ";"
+  # Para cada variable múltiple, reemplaza los códigos numéricos separados por ";"
   # por sus etiquetas, produciendo una columna character con etiquetas separadas por ";".
   # Esto se aplica siempre: es el formato final en 'keep' y el de la variable
   # original cuando se conserva junto a las derivadas en 'dummy'/'split'.
@@ -643,7 +643,7 @@ load_integra_study <- function(study_id,
       if (is.na(x) || !nzchar(x)) return(NA_character_)
       parts  <- trimws(unlist(strsplit(x, ";", fixed = TRUE)))
       labels <- cb_labels[match(parts, cb_codes)]
-      # C\u00F3digos sin etiqueta: dejar el c\u00F3digo original
+      # Códigos sin etiqueta: dejar el código original
       labels[is.na(labels)] <- parts[is.na(labels)]
       paste(labels, collapse = "; ")
     }, USE.NAMES = FALSE)
@@ -661,7 +661,7 @@ load_integra_study <- function(study_id,
 
 
 # -----------------------------------------------------------------------------
-# Helper: expandir variables de respuesta m\u00FAltiple
+# Helper: expandir variables de respuesta múltiple
 # -----------------------------------------------------------------------------
 
 .expand_multi_response <- function(df, variables, codebook,
@@ -669,7 +669,7 @@ load_integra_study <- function(study_id,
                                    drop_original = FALSE) {
   mode <- match.arg(mode)
 
-  # Detectar variables con ";" en alg\u00FAn valor (excluir columnas admin y _O)
+  # Detectar variables con ";" en algún valor (excluir columnas admin y _O)
   study_vars  <- variables$nomvar
   coded_vars  <- study_vars[!stringr::str_ends(study_vars, "_O")]
   multi_vars  <- character(0)
@@ -681,11 +681,11 @@ load_integra_study <- function(study_id,
   }
 
   if (length(multi_vars) == 0) {
-    message("[integra_export] Respuesta m\u00FAltiple: ninguna variable detectada con ';'")
+    message("[integra_export] Respuesta múltiple: ninguna variable detectada con ';'")
     return(list(df = df, variables = variables, codebook = codebook))
   }
 
-  message("[integra_export] Variables de respuesta m\u00FAltiple detectadas (",
+  message("[integra_export] Variables de respuesta múltiple detectadas (",
           length(multi_vars), "): ", paste(multi_vars, collapse = ", "))
 
   new_df        <- df
@@ -698,7 +698,7 @@ load_integra_study <- function(study_id,
     var_label <- if (length(var_label) == 1 && !is.na(var_label)) var_label else v
 
     cb <- codebook[codebook$nomvar == v, ]
-    # Construir tabla c\u00F3digo -> etiqueta para lookup
+    # Construir tabla código -> etiqueta para lookup
     cb_codes  <- suppressWarnings(as.numeric(trimws(cb$value)))
     cb_labels <- trimws(as.character(cb$label))
     valid_cb  <- !is.na(cb_codes)
@@ -708,12 +708,12 @@ load_integra_study <- function(study_id,
     # Si no hay niveles en el codebook, no se puede expandir -> saltar
     if (length(cb_codes) == 0) {
       warning(paste0("[integra_export] Variable '", v,
-                     "' detectada como m\u00FAltiple pero sin niveles en el codebook -- se mantiene como est\u00E1."),
+                     "' detectada como múltiple pero sin niveles en el codebook -- se mantiene como está."),
               call. = FALSE)
       next
     }
 
-    # Splitear cada observaci\u00F3n por ";"
+    # Splitear cada observación por ";"
     raw_vals <- as.character(new_df[[v]])
     split_list <- lapply(raw_vals, function(x) {
       if (is.na(x) || !nzchar(x)) return(NA_character_)
@@ -721,7 +721,7 @@ load_integra_study <- function(study_id,
     })
 
     if (mode == "dummy") {
-      # Una variable dicot\u00F3mica por cada c\u00F3digo del codebook
+      # Una variable dicotómica por cada código del codebook
       # Nombre: VAR_<codigo_numerico>
       new_cols      <- list()
       new_var_rows  <- list()
@@ -733,12 +733,12 @@ load_integra_study <- function(study_id,
         new_name  <- paste0(v, "_", code)
         col_label <- paste0(var_label, " - ", lbl)
 
-        # S\u00ED/No seg\u00FAn si el c\u00F3digo est\u00E1 en las respuestas del individuo
+        # Sí/No según si el código está en las respuestas del individuo
         col_vals <- sapply(split_list, function(x) {
           if (all(is.na(x))) return(NA_character_)
-          if (as.character(code) %in% x) "S\u00ED" else "No"
+          if (as.character(code) %in% x) "Sí" else "No"
         })
-        col_fct <- factor(col_vals, levels = c("S\u00ED", "No"))
+        col_fct <- factor(col_vals, levels = c("Sí", "No"))
         attr(col_fct, "label") <- col_label
 
         new_cols[[new_name]] <- col_fct
@@ -747,14 +747,14 @@ load_integra_study <- function(study_id,
         new_cb_rows[[i]]  <- tibble::tibble(
           nomvar = new_name,
           value  = c("1", "2"),
-          label  = c("S\u00ED", "No")
+          label  = c("Sí", "No")
         )
       }
 
       # Insertar columnas derivadas junto a la original
       if (length(new_cols) == 0) {
         warning(paste0("[integra_export] Variable '", v,
-                       "' no gener\u00F3 columnas derivadas (codebook sin c\u00F3digos v\u00E1lidos) -- se mantiene como est\u00E1."),
+                       "' no generó columnas derivadas (codebook sin códigos válidos) -- se mantiene como está."),
                 call. = FALSE)
         next
       }
@@ -850,7 +850,7 @@ ADMIN_COLS <- c("REGISTRO", "FECHAFIN", "POND", "POND_1", "ESTUDI",
   open_vars  <- study_vars[stringr::str_ends(study_vars, "_O")]
   coded_vars <- setdiff(study_vars, open_vars)
 
-  # Variables m\u00FAltiples: mantener como character para que expand_multi pueda leerlas
+  # Variables múltiples: mantener como character para que expand_multi pueda leerlas
   numeric_vars <- setdiff(coded_vars, multi_vars)
   char_multi   <- intersect(multi_vars, coded_vars)
 
@@ -875,7 +875,7 @@ ADMIN_COLS <- c("REGISTRO", "FECHAFIN", "POND", "POND_1", "ESTUDI",
         vals <- raw$data[[v]][!is.na(raw$data[[v]])]
         if (length(vals) == 0) return(FALSE)
         pct_num <- mean(!is.na(suppressWarnings(as.numeric(as.character(vals)))))
-        pct_num < 0.5  # menos del 50% convertible a n\u00FAmero -> es texto
+        pct_num < 0.5  # menos del 50% convertible a número -> es texto
       })
   ]
   if (length(vars_sin_codebook) > 0)
@@ -925,24 +925,45 @@ ADMIN_COLS <- c("REGISTRO", "FECHAFIN", "POND", "POND_1", "ESTUDI",
 
 
 # -----------------------------------------------------------------------------
-# Helper: truncar etiquetas de niveles a l\u00EDmite SPSS (120 caracteres)
+# Helper: truncar etiquetas de niveles a límite SPSS (120 caracteres)
 # -----------------------------------------------------------------------------
 
 SPSS_MAX_LABEL <- 120L
 
-.truncate_factor_labels <- function(df, context = "") {
+.truncate_labelled_labels <- function(df, context = "") {
+  # ---------------------------------------------------------------------------
+  # FIX (2025): replaces the old .truncate_factor_labels().
+  # haven::labelled vectors store value labels in a named character vector
+  # (attr "labels"). Truncate long entries in that attribute directly.
+  # Plain factors (from multi-response expansion) are handled too.
+  # ---------------------------------------------------------------------------
   truncated_vars <- character(0)
+
   for (v in names(df)) {
     col <- df[[v]]
-    if (!is.factor(col)) next
-    lvls <- levels(col)
-    long <- nchar(lvls) > SPSS_MAX_LABEL
-    if (any(long)) {
-      levels(col)[long] <- substr(lvls[long], 1L, SPSS_MAX_LABEL)
-      df[[v]] <- col
-      truncated_vars <- c(truncated_vars, v)
+
+    if (haven::is.labelled(col)) {
+      lbls <- attr(col, "labels")          # named numeric vector
+      nms  <- names(lbls)
+      long <- nchar(nms) > SPSS_MAX_LABEL
+      if (any(long)) {
+        names(lbls)[long] <- substr(nms[long], 1L, SPSS_MAX_LABEL)
+        attr(col, "labels") <- lbls
+        df[[v]] <- col
+        truncated_vars <- c(truncated_vars, v)
+      }
+
+    } else if (is.factor(col)) {
+      lvls <- levels(col)
+      long <- nchar(lvls) > SPSS_MAX_LABEL
+      if (any(long)) {
+        levels(col)[long] <- substr(lvls[long], 1L, SPSS_MAX_LABEL)
+        df[[v]] <- col
+        truncated_vars <- c(truncated_vars, v)
+      }
     }
   }
+
   if (length(truncated_vars) > 0) {
     warning(context, "Se han recortado etiquetas de nivel a ", SPSS_MAX_LABEL,
             " caracteres en: ", paste(truncated_vars, collapse = ", "),
@@ -956,10 +977,43 @@ SPSS_MAX_LABEL <- 120L
 # Exportar SPSS
 # -----------------------------------------------------------------------------
 
+# ===========================================================================
+# .build_spss_df  —  FIX: use haven::labelled() instead of factor()
+#
+# ROOT CAUSE OF THE BUG
+# ---------------------
+# The original code converted numeric columns with a codebook to R factors:
+#
+#   col <- factor(raw_num, levels = codes, labels = labels)
+#
+# When haven::write_sav() serialises a factor it writes the **integer position**
+# of each level (1, 2, 3, …) as the SPSS numeric code, NOT the original
+# database code (e.g. 1, 2, 7, 99). The factor level names become the value
+# labels.  This is why the SPSS file always had sequential codes 1-N while the
+# Excel (which uses raw numeric values) was correct.
+#
+# THE FIX
+# -------
+# Replace factor() with haven::labelled():
+#
+#   col <- haven::labelled(raw_num, labels = setNames(codes, labels))
+#
+# haven::labelled stores the column as a plain numeric vector decorated with
+# a named integer/double "labels" attribute.  write_sav() serialises this
+# exactly as SPSS numeric codes → value labels, preserving codes like 7, 99.
+#
+# Columns that are already factors (produced by .expand_multi_response for
+# dummy/split variables) are left untouched — their sequential 1/2 codes are
+# intentional (Sí=1, No=2).
+#
+# Columns that are character, Date/POSIXct, or purely numeric (no codebook)
+# are also left untouched, exactly as before.
+# ===========================================================================
+
 .build_spss_df <- function(df_codes, variables, codebook, context = "[integra_export] ") {
 
   df_out <- df_codes
-  n_factor <- 0
+  n_labelled <- 0L
 
   for (v in names(df_out)) {
 
@@ -967,45 +1021,61 @@ SPSS_MAX_LABEL <- 120L
     lbl <- variables$label[variables$nomvar == v]
     var_label <- if (length(lbl) == 1 && !is.na(lbl) && nzchar(lbl)) as.character(lbl) else NULL
 
-    # 2. Buscar niveles en el codebook
+    # 2. Niveles del codebook para esta variable
     cb <- codebook[codebook$nomvar == v, ]
 
     col <- df_out[[v]]
 
-    # Si la columna ya es factor, character o fecha: solo aplicar var_label
     if (is.factor(col) || is.character(col) ||
         inherits(col, c("Date", "POSIXct", "POSIXt"))) {
+      # ------------------------------------------------------------------
+      # Already a factor (multi-response derivadas), character, or date:
+      # just attach the variable label and leave the column type as-is.
+      # ------------------------------------------------------------------
       if (!is.null(var_label)) attr(col, "label") <- var_label
       df_out[[v]] <- col
-      if (is.factor(col)) n_factor <- n_factor + 1
 
     } else if (nrow(cb) > 0) {
-      # Variable num\u00E9rica con codebook: convertir a factor con etiquetas
+      # ------------------------------------------------------------------
+      # Numeric column WITH a codebook entry:
+      # Use haven::labelled() so that write_sav() stores the original
+      # database codes (e.g. 1, 2, 7, 99) as SPSS numeric codes.
+      # ------------------------------------------------------------------
       codes  <- suppressWarnings(as.numeric(trimws(as.character(cb$value))))
       labels <- as.character(cb$label)
       valid  <- !is.na(codes)
 
       if (any(valid)) {
-        codes   <- codes[valid]
-        labels  <- labels[valid]
+        codes  <- codes[valid]
+        labels <- labels[valid]
+
+        # Named numeric vector: names = value labels, values = numeric codes
+        val_labels <- stats::setNames(codes, labels)
+
         raw_num <- suppressWarnings(as.numeric(col))
-        col     <- factor(raw_num, levels = codes, labels = labels)
+
+        col <- haven::labelled(raw_num, labels = val_labels,
+                               label  = var_label)
+        df_out[[v]] <- col
+        n_labelled  <- n_labelled + 1L
+      } else {
         if (!is.null(var_label)) attr(col, "label") <- var_label
         df_out[[v]] <- col
-        n_factor <- n_factor + 1
       }
 
     } else {
-      # Sin codebook: dejar como num\u00E9rico con solo var_label
+      # ------------------------------------------------------------------
+      # Numeric column WITHOUT a codebook: keep as numeric with var_label.
+      # ------------------------------------------------------------------
       if (!is.null(var_label)) attr(col, "label") <- var_label
       df_out[[v]] <- col
     }
   }
 
-  message(context, "Variables convertidas a factor: ", n_factor,
+  message(context, "Variables con value labels (haven::labelled): ", n_labelled,
           " de ", ncol(df_out), " totales")
 
-  .truncate_factor_labels(tibble::as_tibble(df_out), context = context)
+  .truncate_labelled_labels(tibble::as_tibble(df_out), context = context)
 }
 
 
@@ -1025,7 +1095,7 @@ SPSS_MAX_LABEL <- 120L
 
   wb <- openxlsx::createWorkbook()
 
-  # -- Pesta\u00F1a 1: C\u00F3digos -----------------------------------------------------
+  # -- Pestaña 1: Códigos -----------------------------------------------------
   openxlsx::addWorksheet(wb, "Codigos")
   openxlsx::writeData(wb, "Codigos", df_codes, headerStyle = .header_style())
 
@@ -1047,7 +1117,7 @@ SPSS_MAX_LABEL <- 120L
                      cols   = seq_along(names(df_codes)),
                      gridExpand = TRUE)
 
-  # -- Pesta\u00F1a 2: Etiquetas ---------------------------------------------------
+  # -- Pestaña 2: Etiquetas ---------------------------------------------------
   openxlsx::addWorksheet(wb, "Etiquetas")
   openxlsx::writeData(wb, "Etiquetas", df_labels,
                       headerStyle = .header_style())
@@ -1068,8 +1138,8 @@ SPSS_MAX_LABEL <- 120L
 
   wb <- openxlsx::createWorkbook()
 
-  # -- Pesta\u00F1a "preguntas" ----------------------------------------------------
-  # Incluir columna 'tipo' si est\u00E1 presente en variables
+  # -- Pestaña "preguntas" ----------------------------------------------------
+  # Incluir columna 'tipo' si está presente en variables
   if ("tipo" %in% names(variables)) {
     preguntas <- variables |>
       dplyr::select(variable = nomvar, etiqueta = label, tipo) |>
@@ -1085,7 +1155,7 @@ SPSS_MAX_LABEL <- 120L
                       headerStyle = .header_style())
   .autofit_columns(wb, "preguntas", preguntas)
 
-  # -- Pesta\u00F1a "niveles" ------------------------------------------------------
+  # -- Pestaña "niveles" ------------------------------------------------------
   niveles <- codebook |>
     dplyr::select(variable = nomvar, codigo = value, etiqueta = label)
 
@@ -1178,10 +1248,10 @@ apply_variables_dict <- function(spss_path,
   names(niveles)   <- tolower(trimws(names(niveles)))
 
   if (!all(c("variable", "etiqueta") %in% names(preguntas)))
-    stop("[apply_variables_dict] La pesta\u00F1a '", sheet_preguntas,
+    stop("[apply_variables_dict] La pestaña '", sheet_preguntas,
          "' debe tener columnas 'variable' y 'etiqueta'")
   if (!all(c("variable", "codigo", "etiqueta") %in% names(niveles)))
-    stop("[apply_variables_dict] La pesta\u00F1a '", sheet_niveles,
+    stop("[apply_variables_dict] La pestaña '", sheet_niveles,
          "' debe tener columnas 'variable', 'codigo' y 'etiqueta'")
 
   preguntas$variable <- trimws(preguntas$variable)
@@ -1217,7 +1287,7 @@ apply_variables_dict <- function(spss_path,
 
     raw_col <- df[[v]]
 
-    # Despojar clase haven_labelled -> vector at\u00F3mico limpio
+    # Despojar clase haven_labelled -> vector atómico limpio
     if (inherits(raw_col, c("Date", "POSIXct", "POSIXt"))) {
       col <- raw_col
     } else if (haven::is.labelled(raw_col)) {
@@ -1253,7 +1323,7 @@ apply_variables_dict <- function(spss_path,
     } else if (is.character(raw_col)) {
       "TEXTO"
     } else {
-      "N\u00DAMERO"
+      "NÚMERO"
     }
 
     # 4d. Verificar coherencia entre tipo declarado en Excel y tipo real
@@ -1267,27 +1337,27 @@ apply_variables_dict <- function(spss_path,
       }
     }
 
-    # 4e. Tipo objetivo: tipo_nuevo si est\u00E1 relleno, si no -> sin conversi\u00F3n
+    # 4e. Tipo objetivo: tipo_nuevo si está relleno, si no -> sin conversión
     tipo_nuevo <- NULL
     if (has_tipo_nuevo) {
       tn <- preguntas$tipo_nuevo[preguntas$variable == v]
       if (length(tn) == 1 && !is.na(tn) && nzchar(tn)) tipo_nuevo <- tn
     }
 
-    # 4f. Aplicar conversi\u00F3n o value labels
+    # 4f. Aplicar conversión o value labels
     if (!is.null(tipo_nuevo) && tipo_nuevo != tipo_real) {
 
       # -- Conversiones permitidas ------------------------------------------
       converted <- FALSE
 
-      if (tipo_real == "SIMPLE" && tipo_nuevo == "N\u00DAMERO") {
-        # Validar que las etiquetas del codebook sean num\u00E9ricas
+      if (tipo_real == "SIMPLE" && tipo_nuevo == "NÚMERO") {
+        # Validar que las etiquetas del codebook sean numéricas
         if (cb_has_levels) {
           pct_etiq_num <- mean(!is.na(suppressWarnings(as.numeric(labels))))
           if (pct_etiq_num < 0.95) {
             warning(paste0("[apply_variables_dict] '", v,
-                           "': SIMPLE->N\u00DAMERO rechazado: etiquetas no num\u00E9ricas (",
-                           round(pct_etiq_num * 100), "% num\u00E9ricas). Se mantiene como SIMPLE."),
+                           "': SIMPLE->NÚMERO rechazado: etiquetas no numéricas (",
+                           round(pct_etiq_num * 100), "% numéricas). Se mantiene como SIMPLE."),
                     call. = FALSE)
             tipo_nuevo <- NULL  # cancelar
           }
@@ -1301,12 +1371,12 @@ apply_variables_dict <- function(spss_path,
               codigos_na <- na_codes[na_codes %in% unique(col_num[!is.na(col_num)])]
               col_num[mask_na] <- NA_real_
               message("[apply_variables_dict] '", v, "': ", n_na_repl,
-                      " valor(es) -> NA (c\u00F3digos: ", paste(codigos_na, collapse = ", "), ")")
+                      " valor(es) -> NA (códigos: ", paste(codigos_na, collapse = ", "), ")")
             }
           }
           col <- col_num
           converted <- TRUE
-          message("[apply_variables_dict] '", v, "': SIMPLE -> N\u00DAMERO")
+          message("[apply_variables_dict] '", v, "': SIMPLE -> NÚMERO")
         }
 
       } else if (tipo_real == "SIMPLE" && tipo_nuevo == "TEXTO") {
@@ -1319,36 +1389,36 @@ apply_variables_dict <- function(spss_path,
         converted <- TRUE
         message("[apply_variables_dict] '", v, "': SIMPLE -> TEXTO")
 
-      } else if (tipo_real == "N\u00DAMERO" && tipo_nuevo == "TEXTO") {
+      } else if (tipo_real == "NÚMERO" && tipo_nuevo == "TEXTO") {
         col <- as.character(col)
         converted <- TRUE
-        message("[apply_variables_dict] '", v, "': N\u00DAMERO -> TEXTO")
+        message("[apply_variables_dict] '", v, "': NÚMERO -> TEXTO")
 
-      } else if (tipo_real == "TEXTO" && tipo_nuevo == "N\u00DAMERO") {
+      } else if (tipo_real == "TEXTO" && tipo_nuevo == "NÚMERO") {
         vals_noNA <- col[!is.na(col) & nzchar(col)]
         pct_num   <- if (length(vals_noNA) > 0)
           mean(!is.na(suppressWarnings(as.numeric(vals_noNA)))) else 0
         if (pct_num >= 1.0) {
           col <- suppressWarnings(as.numeric(col))
           converted <- TRUE
-          message("[apply_variables_dict] '", v, "': TEXTO -> N\u00DAMERO")
+          message("[apply_variables_dict] '", v, "': TEXTO -> NÚMERO")
         } else {
           warning(paste0("[apply_variables_dict] '", v,
-                         "': TEXTO->N\u00DAMERO rechazado: solo ",
-                         round(pct_num * 100), "% de valores son num\u00E9ricos.",
+                         "': TEXTO->NÚMERO rechazado: solo ",
+                         round(pct_num * 100), "% de valores son numéricos.",
                          " Se mantiene como TEXTO."),
                   call. = FALSE)
         }
 
-      } else if (tipo_nuevo %in% c("M\u00DALTIPLE", "TEXTO") &&
-                 tipo_real  %in% c("M\u00DALTIPLE", "TEXTO")) {
+      } else if (tipo_nuevo %in% c("MÚLTIPLE", "TEXTO") &&
+                 tipo_real  %in% c("MÚLTIPLE", "TEXTO")) {
         col <- as.character(col)
         converted <- TRUE
         message("[apply_variables_dict] '", v, "': ", tipo_real, " -> ", tipo_nuevo,
-                " (normalizaci\u00F3n a character)")
+                " (normalización a character)")
 
       } else {
-        warning(paste0("[apply_variables_dict] '", v, "': conversi\u00F3n ",
+        warning(paste0("[apply_variables_dict] '", v, "': conversión ",
                        tipo_real, "->", tipo_nuevo,
                        " no soportada. Se mantiene el tipo original."),
                 call. = FALSE)
@@ -1357,19 +1427,30 @@ apply_variables_dict <- function(spss_path,
       if (converted) n_tipo_conv <- n_tipo_conv + 1
 
     } else {
-      # Sin conversi\u00F3n: aplicar value labels si es SIMPLE
+      # Sin conversión: aplicar value labels si es SIMPLE
       if (tipo_real == "SIMPLE" && cb_has_levels) {
-        col <- factor(suppressWarnings(as.numeric(col)),
-                      levels = num_codes,
-                      labels = labels)
+        # ------------------------------------------------------------------
+        # FIX (apply_variables_dict): use haven::labelled() here too so
+        # that the re-exported SPSS preserves the original numeric codes.
+        # ------------------------------------------------------------------
+        val_labels <- stats::setNames(num_codes, labels)
+        col <- haven::labelled(suppressWarnings(as.numeric(col)),
+                               labels = val_labels,
+                               label  = var_label)
         n_val_labels <- n_val_labels + 1
       }
     }
 
-    # Aplicar etiqueta de variable
-    if (!is.null(var_label)) {
+    # Aplicar etiqueta de variable (solo si no es ya haven::labelled con label)
+    if (!is.null(var_label) && !haven::is.labelled(col)) {
       attr(col, "label") <- var_label
       n_var_label <- n_var_label + 1
+    } else if (!is.null(var_label) && haven::is.labelled(col) &&
+               is.null(attr(col, "label"))) {
+      attr(col, "label") <- var_label
+      n_var_label <- n_var_label + 1
+    } else if (!is.null(var_label)) {
+      n_var_label <- n_var_label + 1   # already set inside haven::labelled()
     }
 
     df[[v]] <- col
@@ -1383,8 +1464,8 @@ apply_variables_dict <- function(spss_path,
   out_list <- lapply(vars_keep, function(v) df[[v]])
   names(out_list) <- vars_keep
   df_write <- tibble::new_tibble(out_list, nrow = nrow(df))
-  df_write <- .truncate_factor_labels(df_write,
-                                      context = "[apply_variables_dict] ")
+  df_write <- .truncate_labelled_labels(df_write,
+                                        context = "[apply_variables_dict] ")
   haven::write_sav(df_write, output_path)
   message("[apply_variables_dict] SPSS guardado: ", output_path)
 
