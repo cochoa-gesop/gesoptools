@@ -14,7 +14,7 @@ Package R de uso interno en GESOP para trabajar con la base de datos Integra.
 ## Instalacion
 
 ```r
-remotes::install_github("cochoa-gesop/gesoptools")
+remotes::install_github("GESOP-org/gesoptools")
 ```
 
 ## Uso rapido

@@ -5,6 +5,8 @@ Authors@R:
     person("Carlos", "Ochoa", , "cochoa@gesop.net", role = c("aut", "cre"))
 Description: Internal utilities for GESOP: Integra database access, data
     export, survey data processing and visualization.
+URL: https://github.com/GESOP-org/gesoptools, https://gesop-org.github.io/gesoptools/es
+BugReports: https://github.com/GESOP-org/gesoptools/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

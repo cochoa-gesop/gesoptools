@@ -1,6 +1,22 @@
 .Rproj.user
 .Rhistory
 .RData
+.Ruserdata
 .httr-oauth
 .DS_Store
 .quarto
+
+# Credenciales: NUNCA subir. Contiene INTEGRA_USER / INTEGRA_PASSWORD
+.Renviron
+.Rprofile
+
+# Datos de estudios exportados (datos de encuesta, no versionar)
+*.sav
+*.xlsx
+*.xls
+*.csv
+
+# Artefactos de build de R
+*.tar.gz
+*.Rcheck/
+..Rcheck/

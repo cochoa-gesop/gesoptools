@@ -3,7 +3,7 @@
 ## Instalacion
 
 ``` r
-remotes::install_github("cochoa-gesop/gesoptools")
+remotes::install_github("GESOP-org/gesoptools")
 library(gesoptools)
 ```
 

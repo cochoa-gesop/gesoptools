@@ -7,15 +7,15 @@ Integra.
 
 | Funcion | Descripcion |
 |----|----|
-| [`db_config_from_env()`](https://cochoa-gesop.github.io/gesoptools/es/reference/db_config_from_env.md) | Lee las credenciales de Integra desde variables de entorno |
-| [`export_integra()`](https://cochoa-gesop.github.io/gesoptools/es/reference/export_integra.md) | Exporta un estudio a SPSS (.sav) o Excel (.xlsx) |
-| [`load_integra_study()`](https://cochoa-gesop.github.io/gesoptools/es/reference/load_integra_study.md) | Carga un estudio en R con el contrato unificado |
-| [`apply_variables_dict()`](https://cochoa-gesop.github.io/gesoptools/es/reference/apply_variables_dict.md) | Aplica un diccionario revisado a un fichero SPSS |
+| [`db_config_from_env()`](https://gesop-org.github.io/gesoptools/es/reference/db_config_from_env.md) | Lee las credenciales de Integra desde variables de entorno |
+| [`export_integra()`](https://gesop-org.github.io/gesoptools/es/reference/export_integra.md) | Exporta un estudio a SPSS (.sav) o Excel (.xlsx) |
+| [`load_integra_study()`](https://gesop-org.github.io/gesoptools/es/reference/load_integra_study.md) | Carga un estudio en R con el contrato unificado |
+| [`apply_variables_dict()`](https://gesop-org.github.io/gesoptools/es/reference/apply_variables_dict.md) | Aplica un diccionario revisado a un fichero SPSS |
 
 ## Instalacion
 
 ``` r
-remotes::install_github("cochoa-gesop/gesoptools")
+remotes::install_github("GESOP-org/gesoptools")
 ```
 
 ## Uso rapido
@@ -48,10 +48,10 @@ datos <- estudio$data
 ## Documentacion
 
 - [Guia de inicio
-  rapido](https://cochoa-gesop.github.io/gesoptools/es/articles/quickstart.md)
+  rapido](https://gesop-org.github.io/gesoptools/es/articles/quickstart.md)
 - [Exportar a SPSS y
-  Excel](https://cochoa-gesop.github.io/gesoptools/es/articles/export.md)
+  Excel](https://gesop-org.github.io/gesoptools/es/articles/export.md)
 - [Cargar datos en
-  Shiny](https://cochoa-gesop.github.io/gesoptools/es/articles/shiny.md)
+  Shiny](https://gesop-org.github.io/gesoptools/es/articles/shiny.md)
 - [Configurar
-  credenciales](https://cochoa-gesop.github.io/gesoptools/es/articles/credentials.md)
+  credenciales](https://gesop-org.github.io/gesoptools/es/articles/credentials.md)

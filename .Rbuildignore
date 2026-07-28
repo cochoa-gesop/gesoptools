@@ -1,3 +1,8 @@
 ^gesoptools\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^CLAUDE\.md$
+^\.claude$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

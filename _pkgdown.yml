@@ -1,4 +1,4 @@
-url: https://cochoa-gesop.github.io/gesoptools/es
+url: https://gesop-org.github.io/gesoptools/es
 
 template:
   bootstrap: 5
@@ -29,9 +29,9 @@ navbar:
           href: articles/credentials.html
   right:
     - text: "CA"
-      href: "https://cochoa-gesop.github.io/gesoptools/ca"
+      href: "https://gesop-org.github.io/gesoptools/ca"
     - icon: fab fa-github
-      href: https://github.com/cochoa-gesop/gesoptools
+      href: https://github.com/GESOP-org/gesoptools
 
 reference:
   - title: "Conexion y configuracion"

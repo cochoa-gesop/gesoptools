@@ -3,10 +3,10 @@
 ### All vignettes
 
 - [Configurar
-  credenciales](https://cochoa-gesop.github.io/gesoptools/es/articles/credentials.md):
+  credenciales](https://gesop-org.github.io/gesoptools/es/articles/credentials.md):
 - [Exportar a SPSS y
-  Excel](https://cochoa-gesop.github.io/gesoptools/es/articles/export.md):
+  Excel](https://gesop-org.github.io/gesoptools/es/articles/export.md):
 - [Guia de inicio
-  rapido](https://cochoa-gesop.github.io/gesoptools/es/articles/quickstart.md):
+  rapido](https://gesop-org.github.io/gesoptools/es/articles/quickstart.md):
 - [Cargar datos en
-  Shiny](https://cochoa-gesop.github.io/gesoptools/es/articles/shiny.md):
+  Shiny](https://gesop-org.github.io/gesoptools/es/articles/shiny.md):
